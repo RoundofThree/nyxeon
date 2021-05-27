@@ -2,15 +2,14 @@
 
 - Golang backend 
 - VueJS frontend 
-- PostgreSQL 
-- Redis 
+- MongoDB 
+- Redis to store session token and user id mapping 
 
 Database schemas:
 
 - User:
-    - Name, avatar from Github 
+    - Name, avatar from Github, array of quest IDs
 - Quest:
-    - UserID
     - Category
     - Content 
     - Date 

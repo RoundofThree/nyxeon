@@ -1,48 +1,23 @@
 <template>
-  <v-app>
-    <v-app-bar app absolute>
-      <app-nav></app-nav>
-    </v-app-bar>
-    <v-main>
-      <v-container fluid>
-        <router-view></router-view>
-      </v-container>  
-    </v-main>
-    <v-footer app>
-      Copyright RoundofThree
-    </v-footer>
-  </v-app>
+  <div>
+    <!-- Navbar -->
+    <app-nav></app-nav>
+    <!-- Main -->
+    <div class="flex w-full">
+      <router-view></router-view>
+    </div>
+  </div>
 </template>
 
 <script>
-import AppNav from "@/components/AppNav.vue"
+import AppNav from './components/AppNav.vue'
 
 export default {
   components: {
-    AppNav  
+    AppNav
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>

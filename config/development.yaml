@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+mongo:
+  host: localhost
+  db_name: nyxeon
+
+redis:
+  url: http://localhost
+
+githubClientID: 86fcb5a15a814ff63552
+githubClientSecret: 8c9b35249a54acc118b59c2bd9baca861b01a921

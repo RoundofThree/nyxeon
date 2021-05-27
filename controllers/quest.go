@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/RoundofThree/nyxeon/models"
 	"github.com/gin-gonic/gin"
 )
 

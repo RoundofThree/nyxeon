@@ -2,7 +2,9 @@ package server
 
 import (
 	"github.com/RoundofThree/nyxeon/controllers"
+	"github.com/RoundofThree/nyxeon/middlewares"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func NewRouter() *gin.Engine {
@@ -13,21 +15,27 @@ func NewRouter() *gin.Engine {
 	health := new(controllers.HealthController)
 
 	router.GET("/health", health.Status)
-	// deal with session with middlewares
-	router.Use(middlewares.AuthMiddleware())
-
+	// deal with CORS
+	router.Use(middlewares.CORSMiddleware())
+	// create a new unique request ID to each request
+	router.Use(func(c *gin.Context) {
+		uuid, _ := uuid.NewRandom()
+		c.Writer.Header().Set("X-Request-Id", uuid.String())
+		c.Next()
+	})
+	// authentication callback and validation
 	oauth := router.Group("oauth")
 	{
-		oauth.GET("/github", utils.GithubOauthLogin)
-	}
-
-	callback := router.Group("callback")
-	{
-		callback.GET("/github", utils.GithubCallback)
+		auth := new(controllers.AuthTokenController)
+		oauth.GET("/github/callback", auth.GithubOauthCallback)
+		oauth.DELETE("/logout", auth.Logout)
+		// oauth.POST("/verify")
+		// token refresh, no need to! Right?
 	}
 
 	questGroup := router.Group("quests")
 	{
+		questGroup.Use(middlewares.TokenAuthMiddleware())
 		quest := new(controllers.QuestController)
 		questGroup.GET("/", quest.RetrieveAll) // in the future, consider retriving pages
 		questGroup.POST("/", quest.Create)
