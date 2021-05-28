@@ -34,12 +34,26 @@
             >
           </li>
           <li class="flex items-center">
+            <router-link
+              class="lg:text-white lg:hover:text-gray-300 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+              to="/quests/new"
+              ><span class="inline-block ml-2">Register quest</span></router-link
+            >
+          </li>
+          <li class="flex items-center">
+            <button
+              class="lg:text-white lg:hover:text-gray-300 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+              @click="logout"
+              ><span class="inline-block ml-2">Logout</span></button
+            >
+          </li>
+          <li class="flex items-center">
             <button
               class="bg-white text-gray-800 active:bg-gray-100 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none lg:mr-1 lg:mb-0 ml-3 mb-3"
               type="button"
               style="transition: all 0.15s ease 0s;"
             >
-              View on Github
+              View source code
             </button>
           </li>
         </ul>
@@ -48,6 +62,15 @@
   </nav>
 </template>
 <script>
+import axios from "axios"
+const API = "http://localhost:8080/oauth/logout"
+const axiosConfig = {
+  headers: {
+    "Content-Type": "application/json"
+  },
+  withCredentials: true
+}
+
 export default {
   data() {
     return {
@@ -57,6 +80,14 @@ export default {
   methods: {
     toggleNavbar: function(){
       this.showMenu = !this.showMenu;
+    },
+    logout: function() {
+      axios.delete(API, axiosConfig).then(res => {
+        // server must delete session cookie
+        // redirect to / 
+        console.log(res.data)
+        this.$router.push({name: "Home"})
+      })
     }
   }
 }

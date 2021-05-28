@@ -1,5 +1,14 @@
 package main
 
+/*
+import (
+	"fmt"
+
+	"github.com/RoundofThree/nyxeon/config"
+	"github.com/RoundofThree/nyxeon/db"
+)
+*/
+
 import (
 	"flag"
 	"fmt"
@@ -20,5 +29,29 @@ func main() {
 	config.Init(*environment)
 	db.Init()
 	db.InitRedis()
+	fmt.Println("Listening...")
 	server.Init()
+	fmt.Println("Closing connection...")
+	// defer disconnect db and redis
+	defer db.Close()
+	defer db.CloseCache()
 }
+
+/*
+func main() {
+	TestDBConnection()
+}
+
+func TestDBConnection() {
+	config.Init("development")
+	db.Init()
+	database := db.GetDB()
+	if database == nil {
+		fmt.Println("Database is nil")
+	} else {
+		fmt.Println("Database is ", database)
+		fmt.Println("Collection is ", database.Collection("quests"))
+	}
+
+}
+*/

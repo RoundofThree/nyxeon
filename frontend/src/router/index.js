@@ -1,16 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 
+/*
 const requiresAuthentication = (to, from, next) => {
   // check session token in cookie with backend 
   console.log("Checking session token...")
-  let success = false 
+  let success = document.cookie.match(/^(.*;)?\s*nyx_sess_id\s*=\s*[^;]+(.*)?$/)
+  console.log(document.cookie)
+  // if cookie not set
   if (success) {
     return next() 
   }
   // failure 
   next('/')
 }
+*/
 
 const routes = [
   {
@@ -29,8 +33,13 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    beforeEnter: requiresAuthentication,
+    // beforeEnter: requiresAuthentication,
     component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue')
+  },
+  {
+    path: '/quests/new',
+    name: 'NewQuest',
+    component: () => import(/* webpackChunkName: "newquest" */ '../views/NewQuest.vue')
   }
 ]
 

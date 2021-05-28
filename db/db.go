@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -28,10 +29,15 @@ func Init() {
 	}
 	defer cancel()
 	db = mongoClient.Database(dbName)
+	fmt.Println("Database is ", db)
 }
 
 func GetDB() *mongo.Database {
 	return db
+}
+
+func Close() error {
+	return db.Client().Disconnect(context.Background())
 }
 
 // Cache
@@ -50,4 +56,8 @@ func InitRedis() {
 
 func GetCache() redis.Conn {
 	return redisClient
+}
+
+func CloseCache() error {
+	return redisClient.Close()
 }

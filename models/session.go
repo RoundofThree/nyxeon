@@ -1,14 +1,33 @@
 package models
 
-import "github.com/RoundofThree/nyxeon/db"
+import (
+	"fmt"
+	"strconv"
+
+	"github.com/RoundofThree/nyxeon/db"
+)
 
 type SessionManager struct {
 }
 
-// type Session string
+// var cache redis.Conn = db.GetCache()
+
+// type Session string -> email
 
 func (m *SessionManager) FetchSession(sessionToken string) (string, error) {
 	// lookup sessionToken in Redis
-	userID, err := db.GetCache().Do("GET", sessionToken)
-	return userID.(string), err
+	cache := db.GetCache()
+	userID, err := cache.Do("GET", sessionToken)
+	fmt.Println("Got userID from cache", userID)
+	return string(userID.([]byte)), err
+}
+
+func (m *SessionManager) UpdateSession(sessionToken, userID string) error {
+	cache := db.GetCache()
+	fmt.Println("Setting sessiontoken in cache", sessionToken)
+	_, err := cache.Do("SETEX", sessionToken, strconv.Itoa(24*60*60), userID)
+	fmt.Println("Is it stored?")
+	test, _ := cache.Do("GET", sessionToken)
+	fmt.Println(test)
+	return err
 }

@@ -20,13 +20,14 @@ func NewRouter() *gin.Engine {
 	// create a new unique request ID to each request
 	router.Use(func(c *gin.Context) {
 		uuid, _ := uuid.NewRandom()
-		c.Writer.Header().Set("X-Request-Id", uuid.String())
+		c.Writer.Header().Add("X-Request-Id", uuid.String())
 		c.Next()
 	})
 	// authentication callback and validation
 	oauth := router.Group("oauth")
 	{
 		auth := new(controllers.AuthTokenController)
+		auth.Init()
 		oauth.GET("/github/callback", auth.GithubOauthCallback)
 		oauth.DELETE("/logout", auth.Logout)
 		// oauth.POST("/verify")
@@ -37,8 +38,9 @@ func NewRouter() *gin.Engine {
 	{
 		questGroup.Use(middlewares.TokenAuthMiddleware())
 		quest := new(controllers.QuestController)
-		questGroup.GET("/", quest.RetrieveAll) // in the future, consider retriving pages
-		questGroup.POST("/", quest.Create)
+		quest.Init()
+		questGroup.GET("/all", quest.RetrieveAll) // in the future, consider retriving pages
+		questGroup.POST("/new", quest.Create)
 		// questGroup.POST("/:id", quest.Update)
 		questGroup.DELETE("/:id", quest.Delete)
 	}

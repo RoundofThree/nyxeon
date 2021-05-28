@@ -16,5 +16,8 @@ Database schemas:
 
 ## Work in progress 
 
-1. Use gin-oauth2 to expose a Oauth redirection and callback API. 
-2. Add the login frontend page. 
+- [x] Use gin-oauth2 to expose a Oauth redirection and callback API. 
+- [x] Add the login frontend page. 
+- [] Install MongoDB and Redis. 
+- [x] Write the session controller and user controller. 
+- [x] Write the quest controller.  
