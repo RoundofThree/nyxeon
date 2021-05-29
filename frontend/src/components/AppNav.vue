@@ -52,6 +52,7 @@
               class="bg-white text-gray-800 active:bg-gray-100 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none lg:mr-1 lg:mb-0 ml-3 mb-3"
               type="button"
               style="transition: all 0.15s ease 0s;"
+              @click="redirectToGithub"
             >
               View source code
             </button>
@@ -94,6 +95,9 @@ export default {
         this.loggedIn = false 
         this.$router.push({name: "Home"})
       })
+    },
+    redirectToGithub() {
+      window.location.href = "https://github.com/RoundofThree/nyxeon"
     }
   }
 }

@@ -15,7 +15,8 @@
     "autoprefixer": "^9",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
-    "d3": "^6.7.0",
+    "d3": "3",
+    "moment": "^2.29.1",
     "postcss": "^7",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "vue": "^3.0.0",
@@ -45,7 +46,9 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "no-unused-vars": "off"
+    }
   },
   "browserslist": [
     "> 1%",

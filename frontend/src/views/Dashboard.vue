@@ -1,14 +1,9 @@
 <template>
   <div class="container mx-auto px-4 py-4 text-center">
-    <h1>You are logged in using OAuth2!</h1>
     <!--  Heatmap -->
-    <heat-map></heat-map>
-    <ul>
-      <li v-for="quest in quests" :key="quest._id">
-        <span>{{ quest._id }}</span>
-        <span>{{ quest.content }}</span>
-      </li>
-    </ul>
+    <template v-if="ready">
+      <heat-map :entriesIn="quests"></heat-map>
+    </template>
   </div>
 </template>
 <script>
@@ -28,7 +23,8 @@ export default {
   components: { HeatMap },
   data() {
     return {
-      quests: []
+      ready: false,
+      quests: []  // array of {_id, content, categories, date}
     }
   },
   async created() {
@@ -36,6 +32,8 @@ export default {
     axios.get(API, axiosConfig).then(res => {
       setLoggedIn(true)
       this.quests = res.data 
+      this.ready = true
+      console.log(res.data)
     }).catch(err => {
       console.log(err) 
       setLoggedIn(false)

@@ -47,8 +47,24 @@
 </template>
 
 <script>
+import getState from '../store/session'
+import axios from 'axios'
+const axiosConfig = {
+  headers: {
+    "Content-Type": "application/json"
+  },
+  withCredentials: true
+}
+const API = "http://localhost:8080/oauth/verify"
+const setLoggedIn = getState().setLoggedIn
 // call Go backend api to return a URL  
 export default {
+  created() {
+    axios.get(API, axiosConfig).then(res => {
+      if (res.status == 200) setLoggedIn(true)
+      else setLoggedIn(false)
+    })
+  },
   methods: {
     githubLogin() {
       window.location.href = "https://github.com/login/oauth/authorize?client_id=86fcb5a15a814ff63552&redirect_uri=http://localhost:8080/oauth/github/callback"

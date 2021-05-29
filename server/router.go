@@ -30,7 +30,7 @@ func NewRouter() *gin.Engine {
 		auth.Init()
 		oauth.GET("/github/callback", auth.GithubOauthCallback)
 		oauth.DELETE("/logout", auth.Logout)
-		// oauth.POST("/verify")
+		oauth.GET("/verify", auth.Verify)
 		// token refresh, no need to! Right?
 	}
 

@@ -30,6 +30,10 @@ func getSessionFromCookie(r *http.Request) (string, error) {
 	return cookie.Value, nil
 }
 
+func (ctl AuthTokenController) Verify(c *gin.Context) {
+	c.JSON(http.StatusAccepted, gin.H{})
+}
+
 // Validate session token sent by the client and restore session in the request.
 // This is injected as middleware.
 func (ctl AuthTokenController) TokenValid(c *gin.Context) {
@@ -45,7 +49,6 @@ func (ctl AuthTokenController) TokenValid(c *gin.Context) {
 	}
 	// check the session token in Redis
 	userID, err := ctl.sessionManager.FetchSession(token)
-	fmt.Println("UserID from session: ", userID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
 		return

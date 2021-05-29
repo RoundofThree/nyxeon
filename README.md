@@ -21,5 +21,7 @@ Database schemas:
 - [x] Install MongoDB and Redis. 
 - [x] Write the session controller and user controller. 
 - [x] Write the quest controller.  
-- [ ] Add calendar heatmap. 
-- [x] Add state to VueJS. 
+- [x] Add calendar heatmap. 
+- [x] Add state to VueJS.
+- [ ] Add configuration instructions.
+- [ ] Deploy. 
