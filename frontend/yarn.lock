@@ -1183,6 +1183,11 @@
     anymatch "^3.0.0"
     source-map "^0.6.0"
 
+"@voerro/vue-tagsinput@^2.7.1":
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.7.1.tgz#80bb936c645b9294a4566e0569dd1e8c41b65f9c"
+  integrity sha512-G7ClILHgtc/D1vEw9qp6dlsAstlhwLDkPvEp6w1iY/dmSzu4hhxaMk8jyahjxQRDgiLlrAikESOsfkVhy18YwQ==
+
 "@vue/babel-helper-vue-jsx-merge-props@^1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@vue/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-1.2.1.tgz#31624a7a505fb14da1d58023725a4c5f270e6a81"

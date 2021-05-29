@@ -7,56 +7,93 @@
         <h1 class="text-gray-600 font-bold md:text-2xl text-xl">Register your quest</h1>
       </div>
     </div>
-
+    <form v-on:submit.prevent="submitQuest">
     <div class="grid grid-cols-1 mt-5 mx-7">
-      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Categories</label>
-      <input class="py-2 px-3 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" type="text" placeholder="Insert the categories separated by a single comma" />
+      <label for="categories" class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Categories</label>
+      <vue-tags-input class="py-2 px-3 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" element-id="categories" v-model="form.categories" :existing-tags="[
+        { key: 1, name: 'Artificial Intelligence'},
+        { key: 2, name: 'Microservice'}
+      ]" id-field="key" text-field="name" @tag-added="onTagAdded" @tag-removed="onTagRemoved" :typeahead="true" />
     </div>
 
     <div class="grid grid-cols-1 mt-5 mx-7">
-      <label class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Content</label>
-      <textarea style="resize: none; height:auto;" rows="8" class="form-textarea h-24 py-2 px-3 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" type="text" placeholder="Summarize what you have learnt/done." />
+      <label for="content" class="uppercase md:text-sm text-xs text-gray-500 text-light font-semibold">Content</label>
+      <textarea id="content" v-model="form.content" style="resize: none; height:auto;" rows="8" class="form-textarea h-24 py-2 px-3 rounded-lg border-2 border-purple-300 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent" type="text" placeholder="Summarize what you have learnt/done." />
     </div>
 
     <div class='flex items-center justify-center  md:gap-8 gap-4 pt-5 pb-5'>
-      <button @click="submitQuest" class='w-auto bg-gray-500 hover:bg-gray-700 rounded-lg shadow-xl font-medium text-white px-4 py-2'>Create</button>
+      <button class='w-auto bg-gray-500 hover:bg-gray-700 rounded-lg shadow-xl font-medium text-white px-4 py-2'>Create</button>
     </div>
-
+    </form>
   </div>
 </div>
 </template>
 <script>
 // if the fetchQuests request fails, then redirect to / 
 import axios from "axios"
+import VoerroTagsInput from '@voerro/vue-tagsinput'
 const API = "http://localhost:8080/quests/new"
+// const API = "http://localhost:4444"
 const axiosConfig = {
   headers: {
-    "Content-Type": "application/json"
+    "Content-Type": 'application/json;charset=UTF-8',
+    accept: "application/json"
   },
+  data: {},
   withCredentials: true
 }
-
-const parseForm = () => {
-    // SET data from form input 
-}
 export default {
+  components: {
+    'vue-tags-input': VoerroTagsInput
+  },
   data() {
     return {
-      content: "",
-      categories: []
+      form: {
+        content: "",
+        categories: []
+      }
+    }
+  },
+  computed: {
+    filteredItems() {
+      return this.autocompleteItems.filter(i => {
+        return i.text.toLowerCase().indexOf(this.category.toLowerCase()) !== -1
+      })
     }
   },
   methods: {
-    submitQuest: () => {
-      parseForm()
-      axios.post(API, {}, axiosConfig).then(res => {
-        // show flash 
-        console.log(res)
+    submitQuest() {
+      let that = this 
+      if (this.form.content == "" || this.form.categories.length == 0) {
+        alert("Invalid input")
+        return 
+      }
+      const data = new FormData()
+      data.append('content', this.form.content)
+      this.form.categories.forEach(tag => data.append('categories[]', tag))
+      axios.post(API, data, axiosConfig).then(res => {
+        res.data 
+        // clear form 
+        that.form.content = ""
+        that.form.categories = []
+        this.$router.push({name: "Dashboard"})
       }).catch(e => {
         console.log(e)
       })
+    },
+    onTagAdded(tag) {
+      this.form.categories.push(tag.name)
+    },
+    onTagRemoved(tag) {
+      this.form.categories = this.form.categories.filter(e => e !== tag.name)
     }
   }
 }
 
 </script>
+
+<style scoped>
+vue-tags-input {
+  border-color: white !important;
+}
+</style>

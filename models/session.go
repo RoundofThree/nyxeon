@@ -24,10 +24,12 @@ func (m *SessionManager) FetchSession(sessionToken string) (string, error) {
 
 func (m *SessionManager) UpdateSession(sessionToken, userID string) error {
 	cache := db.GetCache()
-	fmt.Println("Setting sessiontoken in cache", sessionToken)
 	_, err := cache.Do("SETEX", sessionToken, strconv.Itoa(24*60*60), userID)
-	fmt.Println("Is it stored?")
-	test, _ := cache.Do("GET", sessionToken)
-	fmt.Println(test)
+	return err
+}
+
+func (m *SessionManager) DeleteSession(sessionToken string) error {
+	cache := db.GetCache()
+	_, err := cache.Do("DEL", sessionToken)
 	return err
 }

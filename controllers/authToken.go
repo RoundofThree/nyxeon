@@ -22,13 +22,19 @@ func (ctl AuthTokenController) Init() {
 	ctl.userManager = new(models.UserManager)
 }
 
+func getSessionFromCookie(r *http.Request) (string, error) {
+	cookie, err := r.Cookie("nyx_sess_id")
+	if err != nil {
+		return "", err
+	}
+	return cookie.Value, nil
+}
+
 // Validate session token sent by the client and restore session in the request.
 // This is injected as middleware.
 func (ctl AuthTokenController) TokenValid(c *gin.Context) {
-	fmt.Println("Validating session cookie...")
 	// extract token from cookie
-	cookie, err := c.Request.Cookie("nyx_sess_id")
-	fmt.Println("Cookie: ", *cookie)
+	token, err := getSessionFromCookie(c.Request)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
@@ -37,7 +43,6 @@ func (ctl AuthTokenController) TokenValid(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
 		return
 	}
-	token := cookie.Value
 	// check the session token in Redis
 	userID, err := ctl.sessionManager.FetchSession(token)
 	fmt.Println("UserID from session: ", userID)
@@ -51,8 +56,21 @@ func (ctl AuthTokenController) TokenValid(c *gin.Context) {
 
 // Deletes the session in server cache.
 func (ctl AuthTokenController) Logout(c *gin.Context) {
+	// extract token from cookie
+	token, err := getSessionFromCookie(c.Request)
+	if err != nil {
+		if err == http.ErrNoCookie {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
+			return
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
+		return
+	}
 	// Delete session in redis
+	ctl.sessionManager.DeleteSession(token)
 	// make client delete session cookie
+	c.SetCookie("nyx_sess_id", "", 0, "/", "localhost", false, true)
+	c.JSON(http.StatusOK, gin.H{"message": "session deleted"})
 }
 
 // to defend against possible CSRF, attach server generated state to the callback URL

@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/RoundofThree/nyxeon/db"
@@ -39,13 +39,16 @@ func (q *QuestManager) GetByUser(u *User) ([]Quest, error) {
 	return quests, nil
 }
 
-// Get by category
+// TODO: Get by category
 func (q *QuestManager) GetByCategory(u *User, category string) ([]Quest, error) {
 	return nil, nil
 }
 
 // Create quest
 func (q *QuestManager) Create(u *User, content string, categories []string) error {
+	if len(content) <= 0 || len(categories) <= 0 {
+		return errors.New("Empty quest not allowed")
+	}
 	var questCollection = db.GetDB().Collection("quests")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -59,10 +62,19 @@ func (q *QuestManager) Create(u *User, content string, categories []string) erro
 	if err != nil {
 		return err
 	}
-	fmt.Println("Inserted a quest: ", result.InsertedID)
-	return nil
+	// insert the quest to user collection
+	var userCollection = db.GetDB().Collection("users")
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	filter := bson.M{"_id": u.Email}
+	update := bson.M{"$push": bson.M{"quests": result.InsertedID.(primitive.ObjectID)}}
+	_, err = userCollection.UpdateOne(ctx, filter, update)
+	return err
 }
 
 // No update operation
 
 // delete quest, not for now
+func (q *QuestManager) Delete(u *User, questID string) error {
+	return nil
+}
