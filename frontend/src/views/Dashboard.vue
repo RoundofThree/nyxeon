@@ -15,6 +15,8 @@
 // if the fetchQuests request fails, then redirect to / 
 import axios from "axios"
 import HeatMap from '../components/HeatMap.vue'
+import getState from '../store/session'
+
 const API = "http://localhost:8080/quests/all"
 const axiosConfig = {
   headers: {
@@ -30,10 +32,13 @@ export default {
     }
   },
   async created() {
+    const setLoggedIn = getState().setLoggedIn
     axios.get(API, axiosConfig).then(res => {
+      setLoggedIn(true)
       this.quests = res.data 
     }).catch(err => {
       console.log(err) 
+      setLoggedIn(false)
       this.$router.push({name: "Home"})
     })
   }

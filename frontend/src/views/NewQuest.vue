@@ -32,6 +32,7 @@
 // if the fetchQuests request fails, then redirect to / 
 import axios from "axios"
 import VoerroTagsInput from '@voerro/vue-tagsinput'
+import getState from '../store/session'
 const API = "http://localhost:8080/quests/new"
 // const API = "http://localhost:4444"
 const axiosConfig = {
@@ -54,11 +55,10 @@ export default {
       }
     }
   },
-  computed: {
-    filteredItems() {
-      return this.autocompleteItems.filter(i => {
-        return i.text.toLowerCase().indexOf(this.category.toLowerCase()) !== -1
-      })
+  async created() {
+    const loggedIn = getState().loggedIn
+    if (!loggedIn) {
+      this.$router.push({name: "Home"})
     }
   },
   methods: {

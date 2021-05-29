@@ -26,21 +26,21 @@
               ><span class="inline-block ml-2">About</span></router-link
             >
           </li>
-          <li class="flex items-center">
+          <li v-if="loggedIn" class="flex items-center">
             <router-link
               class="lg:text-white lg:hover:text-gray-300 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
               to="/dashboard"
-              ><span class="inline-block ml-2">Dashboard (test only)</span></router-link
+              ><span class="inline-block ml-2">Dashboard</span></router-link
             >
           </li>
-          <li class="flex items-center">
+          <li v-if="loggedIn" class="flex items-center">
             <router-link
               class="lg:text-white lg:hover:text-gray-300 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
               to="/quests/new"
               ><span class="inline-block ml-2">Register quest</span></router-link
             >
           </li>
-          <li class="flex items-center">
+          <li v-if="loggedIn" class="flex items-center">
             <button
               class="lg:text-white lg:hover:text-gray-300 text-gray-800 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
               @click="logout"
@@ -63,6 +63,8 @@
 </template>
 <script>
 import axios from "axios"
+import getState from '../store/session'
+
 const API = "http://localhost:8080/oauth/logout"
 const axiosConfig = {
   headers: {
@@ -71,10 +73,13 @@ const axiosConfig = {
   withCredentials: true
 }
 
+const state = getState().loggedIn 
+
 export default {
   data() {
     return {
-      showMenu: false
+      showMenu: false,
+      loggedIn: state 
     }
   },
   methods: {
@@ -86,6 +91,7 @@ export default {
         // server must delete session cookie
         // redirect to / 
         console.log(res.data)
+        this.loggedIn = false 
         this.$router.push({name: "Home"})
       })
     }

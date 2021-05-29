@@ -18,6 +18,8 @@ Database schemas:
 
 - [x] Use gin-oauth2 to expose a Oauth redirection and callback API. 
 - [x] Add the login frontend page. 
-- [] Install MongoDB and Redis. 
+- [x] Install MongoDB and Redis. 
 - [x] Write the session controller and user controller. 
 - [x] Write the quest controller.  
+- [ ] Add calendar heatmap. 
+- [x] Add state to VueJS. 
