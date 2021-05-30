@@ -23,5 +23,7 @@ Database schemas:
 - [x] Write the quest controller.  
 - [x] Add calendar heatmap. 
 - [x] Add state to VueJS.
+- [ ] Add pie chart. 
+- [ ] Lint code. 
 - [ ] Add configuration instructions.
 - [ ] Deploy. 
