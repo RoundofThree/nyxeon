@@ -1,15 +1,15 @@
 package middlewares
 
 import (
-	"fmt"
-
+	"github.com/RoundofThree/nyxeon/config"
 	"github.com/gin-gonic/gin"
 )
 
+// Middleware to handle CORS. Configure the allowed origins in config cors.origin.
 func CORSMiddleware() gin.HandlerFunc {
+	config := config.GetConfig()
 	return func(c *gin.Context) {
-		fmt.Println("Setting CORS")
-		c.Writer.Header().Add("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Writer.Header().Add("Access-Control-Allow-Origin", config.GetString("cors.origin"))
 		c.Writer.Header().Add("Access-Control-Max-Age", "86400")
 		c.Writer.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
 		c.Writer.Header().Add("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, x-access-token")

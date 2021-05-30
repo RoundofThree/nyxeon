@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -12,10 +11,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Database
+// NoSQL database
 
 var db *mongo.Database
 
+// Connect to the database.
 func Init() {
 	c := config.GetConfig()
 
@@ -29,13 +29,14 @@ func Init() {
 	}
 	defer cancel()
 	db = mongoClient.Database(dbName)
-	fmt.Println("Database is ", db)
 }
 
+// Return a pointer to the database.
 func GetDB() *mongo.Database {
 	return db
 }
 
+// Close the connection to the database,
 func Close() error {
 	return db.Client().Disconnect(context.Background())
 }
@@ -44,6 +45,7 @@ func Close() error {
 
 var redisClient redis.Conn
 
+// Connect to Redis cache.
 func InitRedis() {
 	c := config.GetConfig()
 	redis_url := c.GetString("redis.url")
@@ -54,10 +56,12 @@ func InitRedis() {
 	redisClient = conn
 }
 
+// Return the connection to the Redis cache.
 func GetCache() redis.Conn {
 	return redisClient
 }
 
+// Close the connection to the Redis cache.
 func CloseCache() error {
 	return redisClient.Close()
 }

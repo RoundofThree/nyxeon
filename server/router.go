@@ -12,9 +12,6 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	health := new(controllers.HealthController)
-
-	router.GET("/health", health.Status)
 	// deal with CORS
 	router.Use(middlewares.CORSMiddleware())
 	// create a new unique request ID to each request
@@ -23,7 +20,7 @@ func NewRouter() *gin.Engine {
 		c.Writer.Header().Add("X-Request-Id", uuid.String())
 		c.Next()
 	})
-	// authentication callback and validation
+	// authentication
 	oauth := router.Group("oauth")
 	{
 		auth := new(controllers.AuthTokenController)
@@ -31,7 +28,6 @@ func NewRouter() *gin.Engine {
 		oauth.GET("/github/callback", auth.GithubOauthCallback)
 		oauth.DELETE("/logout", auth.Logout)
 		oauth.GET("/verify", auth.Verify)
-		// token refresh, no need to! Right?
 	}
 
 	questGroup := router.Group("quests")
@@ -42,7 +38,7 @@ func NewRouter() *gin.Engine {
 		questGroup.GET("/all", quest.RetrieveAll) // in the future, consider retriving pages
 		questGroup.POST("/new", quest.Create)
 		// questGroup.POST("/:id", quest.Update)
-		questGroup.DELETE("/:id", quest.Delete)
+		// questGroup.DELETE("/:id", quest.Delete)
 	}
 	return router
 }

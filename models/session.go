@@ -1,33 +1,29 @@
 package models
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/RoundofThree/nyxeon/db"
 )
 
-type SessionManager struct {
-}
+type SessionManager struct{}
 
-// var cache redis.Conn = db.GetCache()
-
-// type Session string -> email
-
+// Get the user id from the session token.
 func (m *SessionManager) FetchSession(sessionToken string) (string, error) {
-	// lookup sessionToken in Redis
 	cache := db.GetCache()
 	userID, err := cache.Do("GET", sessionToken)
-	fmt.Println("Got userID from cache", userID)
 	return string(userID.([]byte)), err
 }
 
+// Add session token mapping to user id in cache. If the session token
+// already exists in cache, its expiry time resets to 24*60*60.
 func (m *SessionManager) UpdateSession(sessionToken, userID string) error {
 	cache := db.GetCache()
 	_, err := cache.Do("SETEX", sessionToken, strconv.Itoa(24*60*60), userID)
 	return err
 }
 
+// Delete the session token in cache.
 func (m *SessionManager) DeleteSession(sessionToken string) error {
 	cache := db.GetCache()
 	_, err := cache.Do("DEL", sessionToken)

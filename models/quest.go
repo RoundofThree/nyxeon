@@ -19,10 +19,8 @@ type Quest struct {
 
 type QuestManager struct{}
 
-// fetch all quests from user defined by the session token
+// Fetch all quests from the user.
 func (q *QuestManager) GetByUser(u *User) ([]Quest, error) {
-	// ids := u.Quests
-	// bulk operation
 	var questCollection = db.GetDB().Collection("quests")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -39,12 +37,12 @@ func (q *QuestManager) GetByUser(u *User) ([]Quest, error) {
 	return quests, nil
 }
 
-// TODO: Get by category
+// Get all quests by the user tagged with the given category. TODO: not implemented yet.
 func (q *QuestManager) GetByCategory(u *User, category string) ([]Quest, error) {
 	return nil, nil
 }
 
-// Create quest
+// Create a quest with the given content and categories to the given user.
 func (q *QuestManager) Create(u *User, content string, categories []string) error {
 	if len(content) <= 0 || len(categories) <= 0 {
 		return errors.New("Empty quest not allowed")
@@ -62,7 +60,7 @@ func (q *QuestManager) Create(u *User, content string, categories []string) erro
 	if err != nil {
 		return err
 	}
-	// insert the quest to user collection
+	// insert the quest id to user collection
 	var userCollection = db.GetDB().Collection("users")
 	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -72,9 +70,7 @@ func (q *QuestManager) Create(u *User, content string, categories []string) erro
 	return err
 }
 
-// No update operation
-
-// delete quest, not for now
+// TODO: Delete quest given by id and delete its reference in the user collection.
 func (q *QuestManager) Delete(u *User, questID string) error {
 	return nil
 }

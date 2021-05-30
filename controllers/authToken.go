@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/RoundofThree/nyxeon/config"
@@ -17,11 +16,13 @@ type AuthTokenController struct {
 	userManager    *models.UserManager
 }
 
+// Prepare the controller.
 func (ctl AuthTokenController) Init() {
 	ctl.sessionManager = new(models.SessionManager)
 	ctl.userManager = new(models.UserManager)
 }
 
+// Get the session token from the request cookie.
 func getSessionFromCookie(r *http.Request) (string, error) {
 	cookie, err := r.Cookie("nyx_sess_id")
 	if err != nil {
@@ -30,12 +31,13 @@ func getSessionFromCookie(r *http.Request) (string, error) {
 	return cookie.Value, nil
 }
 
+// Verify that the user request is authorized by checking the cookie.
 func (ctl AuthTokenController) Verify(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{})
 }
 
 // Validate session token sent by the client and restore session in the request.
-// This is injected as middleware.
+// This is called by a middleware.
 func (ctl AuthTokenController) TokenValid(c *gin.Context) {
 	// extract token from cookie
 	token, err := getSessionFromCookie(c.Request)
@@ -57,7 +59,7 @@ func (ctl AuthTokenController) TokenValid(c *gin.Context) {
 	c.Set("userID", userID)
 }
 
-// Deletes the session in server cache.
+// Delete the session in cache and instruct the client to delete its cookie.
 func (ctl AuthTokenController) Logout(c *gin.Context) {
 	// extract token from cookie
 	token, err := getSessionFromCookie(c.Request)
@@ -72,7 +74,7 @@ func (ctl AuthTokenController) Logout(c *gin.Context) {
 	// Delete session in redis
 	ctl.sessionManager.DeleteSession(token)
 	// make client delete session cookie
-	c.SetCookie("nyx_sess_id", "", 0, "/", "localhost", false, true)
+	c.SetCookie("nyx_sess_id", "", 0, "/", config.GetConfig().GetString("client.domain"), false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "session deleted"})
 }
 
@@ -86,6 +88,7 @@ func (ctl AuthTokenController) StartOauth(c *gin.Context) {
 }
 */
 
+// Handle the Github OAuth callback. Retrieve the code and exchange an access token.
 func (ctl AuthTokenController) GithubOauthCallback(c *gin.Context) {
 	// get the code
 	err := c.Request.ParseForm()
@@ -94,7 +97,6 @@ func (ctl AuthTokenController) GithubOauthCallback(c *gin.Context) {
 		return
 	}
 	code := c.Request.FormValue("code")
-	fmt.Println("Code is ", code)
 	// request Github API
 	token, err := config.GetOauthConfig().Exchange(context.Background(), code)
 	if err != nil {
@@ -114,9 +116,6 @@ func (ctl AuthTokenController) GithubOauthCallback(c *gin.Context) {
 	// store session to Redis
 	newUUID, err := uuid.NewRandom()
 	sessionToken := newUUID.String()
-	fmt.Println("Token is ", sessionToken)
-	fmt.Println("User is ", *user)
-	fmt.Println("Email is ", user.GetEmail())
 	err = ctl.sessionManager.UpdateSession(sessionToken, user.GetEmail())
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{})
@@ -128,7 +127,7 @@ func (ctl AuthTokenController) GithubOauthCallback(c *gin.Context) {
 		ctl.userManager.CreateUser(user.GetEmail())
 	}
 	// set cookie nyx_sess_id
-	c.SetCookie("nyx_sess_id", sessionToken, 60*60*24, "/", "localhost", false, true)
+	c.SetCookie("nyx_sess_id", sessionToken, 60*60*24, "/", config.GetConfig().GetString("client.domain"), false, true)
 	// send HTTP Found to client side dashboard url
-	c.Redirect(http.StatusFound, "http://localhost:3000/dashboard")
+	c.Redirect(http.StatusFound, config.GetConfig().GetString("oauth.redirect"))
 }

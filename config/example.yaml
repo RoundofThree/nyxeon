@@ -1,0 +1,20 @@
+server: 0.0.0.0:8080
+
+client:
+  domain: localhost
+
+cors: 
+  origin: http://localhost:3000
+
+mongo:
+  host: mongodb+srv://username:password@cluster0.gckcg.mongodb.net/db_name?retryWrites=true&w=majority
+  db_name: nyxeon
+
+redis:
+  url: redis://localhost:6379/0
+
+oauth:
+  githubClientID: 
+  githubClientSecret: 
+  githubScopes: ["user:email"]
+  redirect: http://localhost:3000/dashboard

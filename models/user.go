@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/RoundofThree/nyxeon/db"
@@ -15,10 +14,9 @@ type User struct {
 	Quests []primitive.ObjectID `bson:"quests,omitempty"`
 }
 
-type UserManager struct {
-}
+type UserManager struct{}
 
-// Get the user given the userID
+// Get the user given the userID.
 func (u *UserManager) GetByUserID(userID string) (*User, error) {
 	var userCollection = db.GetDB().Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -34,7 +32,7 @@ func (u *UserManager) GetByUserID(userID string) (*User, error) {
 	return &user, nil
 }
 
-// Create a user given the user ID
+// Create a user given the userID.
 func (u *UserManager) CreateUser(userID string) (*User, error) {
 	var userCollection = db.GetDB().Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -43,11 +41,9 @@ func (u *UserManager) CreateUser(userID string) (*User, error) {
 		Email:  userID,
 		Quests: []primitive.ObjectID{},
 	}
-	result, err := userCollection.InsertOne(ctx, user)
-	// error if there is already a user with that email
+	_, err := userCollection.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("The inserted id is ", result.InsertedID)
 	return &user, nil
 }
