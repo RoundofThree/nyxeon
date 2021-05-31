@@ -1,6 +1,8 @@
 # Project Nyxeon
 
-This is my first project using Golang. The 
+This is my first project using Golang. It is used to track down learning and working. 
+It is satisfactory to see a consistently colored contribution graph like the one at Github, not only for code commits, but also for other matters like reviewing a paper, 
+reading a chapter of a book, participating in a contest...
 
 ## Tech stack 
 
@@ -37,6 +39,15 @@ You must provide:
 - `oauth`: The client ID and client secret and scopes. Set the redirect url after callback is successful. 
 
 ## Deployment 
+
+Containerize using Docker. 
+
+```bash 
+docker build -t nyxeon . 
+docker run --name nyxeon-backend --rm -p <port>:<port> nyxeon
+```
+
+To deploy to Heroku, set the stack to container. 
 
 ## Work in progress 
 
