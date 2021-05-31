@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	environment := flag.String("m", "development", "Production or development")
+	environment := flag.String("m", "production", "Production or development")
 	flag.Usage = func() {
 		fmt.Println("Usage: server -m {development | production}")
 		os.Exit(1)

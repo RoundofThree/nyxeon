@@ -51,12 +51,12 @@ func (ctl QuestController) Create(c *gin.Context) {
 	}
 	err = c.Request.ParseMultipartForm(1000)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "not authorized"})
 	}
 	content := c.Request.Form.Get("content")
 	categories := c.Request.Form["categories[]"]
 	if err = ctl.questManager.Create(user, content, categories); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "not authorized"})
 	}
 	c.JSON(http.StatusCreated, gin.H{})
 }

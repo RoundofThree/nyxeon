@@ -33,7 +33,22 @@ func getSessionFromCookie(r *http.Request) (string, error) {
 
 // Verify that the user request is authorized by checking the cookie.
 func (ctl AuthTokenController) Verify(c *gin.Context) {
-	c.JSON(http.StatusAccepted, gin.H{})
+	token, err := getSessionFromCookie(c.Request)
+	if err != nil {
+		if err == http.ErrNoCookie {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "not authorized"})
+			return
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "not authorized"})
+		return
+	}
+	// check the session token in Redis
+	userID, err := ctl.sessionManager.FetchSession(token)
+	if err != nil || userID == "" {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "not authorized"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "successful"})
 }
 
 // Validate session token sent by the client and restore session in the request.
@@ -43,16 +58,16 @@ func (ctl AuthTokenController) TokenValid(c *gin.Context) {
 	token, err := getSessionFromCookie(c.Request)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "not authorized"})
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "not authorized"})
 		return
 	}
 	// check the session token in Redis
 	userID, err := ctl.sessionManager.FetchSession(token)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "not authorized"})
 		return
 	}
 	// access in other handlers in c.Keys
@@ -65,16 +80,25 @@ func (ctl AuthTokenController) Logout(c *gin.Context) {
 	token, err := getSessionFromCookie(c.Request)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "not authorized"})
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "not authorized"})
 		return
 	}
 	// Delete session in redis
 	ctl.sessionManager.DeleteSession(token)
 	// make client delete session cookie
-	c.SetCookie("nyx_sess_id", "", 0, "/", config.GetConfig().GetString("client.domain"), false, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "nyx_sess_id",
+		Value:    "",
+		Path:     "/",
+		Domain:   config.GetConfig().GetString("client.domain"),
+		MaxAge:   0,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: 4,
+	})
 	c.JSON(http.StatusOK, gin.H{"message": "session deleted"})
 }
 
@@ -118,7 +142,7 @@ func (ctl AuthTokenController) GithubOauthCallback(c *gin.Context) {
 	sessionToken := newUUID.String()
 	err = ctl.sessionManager.UpdateSession(sessionToken, user.GetEmail())
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "not authorized"})
 		return
 	}
 	// db create user if not present
@@ -127,7 +151,17 @@ func (ctl AuthTokenController) GithubOauthCallback(c *gin.Context) {
 		ctl.userManager.CreateUser(user.GetEmail())
 	}
 	// set cookie nyx_sess_id
-	c.SetCookie("nyx_sess_id", sessionToken, 60*60*24, "/", config.GetConfig().GetString("client.domain"), false, true)
+	// c.SetCookie("nyx_sess_id", sessionToken, 60*60*24, "/", config.GetConfig().GetString("client.domain"), true, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "nyx_sess_id",
+		Value:    sessionToken,
+		Path:     "/",
+		Domain:   config.GetConfig().GetString("client.domain"),
+		MaxAge:   604800,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: 4,
+	})
 	// send HTTP Found to client side dashboard url
 	c.Redirect(http.StatusFound, config.GetConfig().GetString("oauth.redirect"))
 }
