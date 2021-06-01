@@ -7,7 +7,7 @@ reading a chapter of a book, participating in a contest...
 ## Tech stack 
 
 - Golang + Gin Framework for Backend
-- VueJS for Frontend 
+- [VueJS for Frontend](https://github.com/RoundofThree/nyxeon-frontend) 
 - MongoDB as primary database
 - Redis to store session 
 
