@@ -1,6 +1,6 @@
 # Project Nyxeon
 
-This is my first project using Golang. It is used to track down learning and working. 
+This is my first project using Golang and it is far from perfect. It is used to track down learning and working. 
 It is satisfactory to see a consistently colored contribution graph like the one at Github, not only for code commits, but also for other matters like reviewing a paper, 
 reading a chapter of a book, participating in a contest...
 
@@ -63,3 +63,4 @@ To deploy to Heroku, set the stack to container.
 - [x] Add configuration instructions.
 - [x] Deploy. 
 - [x] Write Dockerfile. 
+- [ ] Write unit and integration tests. 
