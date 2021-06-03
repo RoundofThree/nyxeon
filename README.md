@@ -64,3 +64,4 @@ To deploy to Heroku, set the stack to container.
 - [x] Deploy. 
 - [x] Write Dockerfile. 
 - [ ] Write unit and integration tests. 
+- [ ] Implement Google OAuth2. 
